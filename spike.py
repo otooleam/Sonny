@@ -16,8 +16,12 @@ async def on_ready():
 @bot.command(name='raid')
 async def raid(ctx, *args):
     print('raid command recieved')
-    
-    embed=discord.Embed(title=f'{" ".join(args[:-1])} Raid', description=f'Time Remaining: {args[-1]}')
+    embed = None
+    if len(args) > 1:
+        embed=discord.Embed(title=f'{" ".join(args[:-1])} Raid', description=f'Time Remaining: {args[-1]}')
+    else:
+        embed=discord.Embed(title=f'{args[0]} Raid')
+        
     embed.add_field(name='Host', value=f'{ctx.message.author.mention}', inline=False)
     embed.add_field(name='Participants', value='none', inline=False)
     embed.set_footer(text=f'{join_emote} to join. {leave_emote} to leave.')
@@ -41,9 +45,10 @@ async def on_reaction_add(reaction, user):
         host = embed.fields[0].value
         participants_list = embed.fields[1].value.split()
 
+        await reaction.remove(user)
+
         if reaction.emoji == join_emote:
             if user.mention == host:
-                #remove react
                 return
             elif user.mention in participants_list:
                 return
@@ -53,18 +58,15 @@ async def on_reaction_add(reaction, user):
                 participants_list.append(user.mention)
         elif reaction.emoji == battle_emote:
             if user.mention != host:
-                #remove reaction
                 return
             elif 'none' in participants_list:
                 return
             else:
-                #remove reaction
                 raiders = participants_list[:5]
                 participants_list = participants_list[5:]
                 await reaction.message.channel.send(f'{" ".join(raiders)}: invites from {host} for a {embed.title} will be sent shortly')
         elif reaction.emoji == leave_emote:
             if user.mention == host:
-                #remove react
                 return
             elif user.mention not in participants_list:
                 return
