@@ -19,7 +19,11 @@ async def raid(ctx, *, args: str):
     if ' ' in args:
         boss = args.rsplit(' ', 1)[0]
         time = args.rsplit(' ', 1)[1]
-        embed = discord.Embed(title = f'{boss} Raid', description = f'Time Remaining: {time}')
+        if time.isnumeric() and 0<int(time)<=45:
+            embed = discord.Embed(title = f'{boss} Raid', description = f'Time Remaining: {time}')
+        else:
+            await ctx.send('Invalid time!')
+            return
     else:
         embed = discord.Embed(title = f'{args} Raid')
 
