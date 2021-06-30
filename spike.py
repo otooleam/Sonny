@@ -2,15 +2,12 @@ import os
 import discord
 from discord.ext import commands
 
-TOKEN = 'ODU1NjM3OTYxMzQ4MjE4OTEx.YM1Y8g.khrHpz4AWDWUaZ--pJASnmkFIZQ'
+TOKEN = ''
 join_emote = '\N{White Heavy Check Mark}'
 battle_emote = '\N{Crossed Swords}'
 leave_emote = '\N{No Entry Sign}'
 
-bot = commands.Bot(command_prefix='!')
-
-def to_upper(arg):
-    return arg.upper()
+bot = commands.Bot(case_insensitive=True, command_prefix='!')
 
 @bot.event
 async def on_ready():
@@ -18,7 +15,6 @@ async def on_ready():
 
 @bot.command(name='raid')
 async def raid(ctx, *args):
-    print('raid command recieved')
     embed = None
     if len(args) > 1:
         embed=discord.Embed(title=f'{" ".join(args[:-1])} Raid', description=f'Time Remaining: {args[-1]}')
