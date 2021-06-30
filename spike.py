@@ -13,17 +13,20 @@ bot = commands.Bot(case_insensitive=True, command_prefix='!')
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
-@bot.command(name='raid')
-async def raid(ctx, *args):
+@bot.command(name = 'raid')
+async def raid(ctx, *, args: str):
     embed = None
-    if len(args) > 1:
-        embed=discord.Embed(title=f'{" ".join(args[:-1])} Raid', description=f'Time Remaining: {args[-1]}')
+    if ' ' in args:
+        boss = args.rsplit(' ', 1)[0]
+        time = args.rsplit(' ', 1)[1]
+        embed = discord.Embed(title = f'{boss} Raid', description = f'Time Remaining: {time}')
     else:
-        embed=discord.Embed(title=f'{args[0]} Raid')
-        
-    embed.add_field(name='Host', value=f'{ctx.message.author.mention}', inline=False)
-    embed.add_field(name='Participants', value='none', inline=False)
-    embed.set_footer(text=f'{join_emote} to join. {leave_emote} to leave.\nHost: {battle_emote} to ping participants for raid start')
+        embed = discord.Embed(title = f'{args} Raid')
+
+    embed.add_field(name = 'Host', value = f'{ctx.message.author.mention}', inline = False)
+    embed.add_field(name = 'Participants', value = 'none', inline = False)
+    embed.set_footer(
+        text = f'{join_emote} to join. {leave_emote} to leave.\nHost: {battle_emote} to ping participants for raid start')
 
     message = await ctx.send(embed = embed)
 
