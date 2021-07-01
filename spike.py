@@ -6,6 +6,7 @@ TOKEN = ''
 join_emote = '\N{White Heavy Check Mark}'
 battle_emote = '\N{Crossed Swords}'
 leave_emote = '\N{No Entry Sign}'
+delete_emote = '\N{Octagonal Sign}'
 
 bot = commands.Bot(case_insensitive=True, command_prefix='!')
 
@@ -30,13 +31,14 @@ async def raid(ctx, *, args: str):
     embed.add_field(name = 'Host', value = f'{ctx.message.author.mention}', inline = False)
     embed.add_field(name = 'Participants', value = 'none', inline = False)
     embed.set_footer(
-        text = f'{join_emote} to join. {leave_emote} to leave.\nHost: {battle_emote} to ping participants for raid start')
+        text = f'{join_emote} to join. {leave_emote} to leave.\nHost: {battle_emote} to ping participants for raid start. {delete_emote} when the raid is done.')
 
     message = await ctx.send(embed = embed)
 
     await message.add_reaction(join_emote)
-    await message.add_reaction(battle_emote)
     await message.add_reaction(leave_emote)
+    await message.add_reaction(battle_emote)
+    await message.add_reaction(delete_emote)
 
 @bot.event
 async def on_reaction_add(reaction, user):
@@ -50,7 +52,7 @@ async def on_reaction_add(reaction, user):
         embed = reaction.message.embeds[0]
         host = embed.fields[0].value
         participants_list = embed.fields[1].value.split()
-        dirty = false
+        dirty = False
 
         await reaction.remove(user)
 
@@ -63,7 +65,7 @@ async def on_reaction_add(reaction, user):
                 if 'none' in participants_list:
                     participants_list.remove('none')
                 participants_list.append(user.mention)
-                dirty = true
+                dirty = True
         elif reaction.emoji == battle_emote:
             if user.mention != host:
                 return
@@ -75,7 +77,7 @@ async def on_reaction_add(reaction, user):
                 await reaction.message.channel.send(f'{" ".join(raiders)}: invites from {host} for a {embed.title} will be sent shortly')
                 if len(participants_list) < 1:
                     participants_list.append('none')
-                dirty = true
+                dirty = True
         elif reaction.emoji == leave_emote:
             if user.mention == host:
                 return
@@ -85,7 +87,11 @@ async def on_reaction_add(reaction, user):
                 participants_list.remove(user.mention)
                 if len(participants_list) == 0:
                     participants_list.append('none')
-                dirt = true
+                dirty = True
+        elif reaction.emoji == delete_emote:
+            if user.mention != host:
+                return
+            await reaction.message.delete()
         if dirty:
             embed.set_field_at(1, name='Participants', value='\n'.join(participants_list), inline=False)
             await reaction.message.edit(embed = embed)
